@@ -8,6 +8,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    env:
+      PROJECT_DIR: BlueNineAccess_Full_Buildable/Blue Nine Access
+
     steps:
       - uses: actions/checkout@v4
 
@@ -16,32 +19,27 @@ jobs:
           distribution: temurin
           java-version: 17
 
-      # Install Android SDK + common components
-      - uses: android-actions/setup-android@v3
-        with:
-          packages: |
-            platform-tools
-            platforms;android-34
-            build-tools;34.0.0
-
-      # Use Gradle action to run in your subfolder (no local wrapper required)
-      - name: List Gradle projects (for diagnostics)
+      - name: Ensure Gradle wrapper exists
         uses: gradle/gradle-build-action@v3
         with:
           gradle-version: 8.7
-          build-root-directory: BlueNineAccess_Full_Buildable/Blue Nine Access
-          arguments: projects
+          build-root-directory: ${{ env.PROJECT_DIR }}
+          arguments: wrapper
+
+      - name: List Gradle projects (diagnostics)
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          chmod +x ./gradlew
+          ./gradlew projects
 
       - name: Build debug APK
-        uses: gradle/gradle-build-action@v3
-        with:
-          gradle-version: 8.7
-          build-root-directory: BlueNineAccess_Full_Buildable/Blue Nine Access
-          arguments: :app:assembleDebug --stacktrace
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          ./gradlew :app:assembleDebug --stacktrace
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: bluenineaccess-debug-apk
-          path: BlueNineAccess_Full_Buildable/Blue Nine Access/app/build/outputs/apk/debug/*.apk
+          path: ${{ env.PROJECT_DIR }}/app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
