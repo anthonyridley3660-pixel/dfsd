@@ -1,0 +1,47 @@
+name: Build Blue Nine Access (APK)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main, master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Gradle setup/cache
+        uses: gradle/gradle-build-action@v3
+        with:
+          gradle-version: 8.7
+
+      - name: Build debug APK (try multiple paths)
+        run: |
+          if [ -x "./gradlew" ]; then
+            chmod +x ./gradlew
+            G=./gradlew
+          else
+            G=gradle
+          fi
+
+          set -e
+          $G ":Blue Nine Access:app:assembleDebug" \
+          || $G ":BlueNineAccess:app:assembleDebug" \
+          || $G ":app:assembleDebug"
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bluenineaccess-debug-apk
+          path: "**/app/build/outputs/apk/debug/*.apk"
+          if-no-files-found: error
+
