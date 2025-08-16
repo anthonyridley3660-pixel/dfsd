@@ -2,43 +2,46 @@ name: Build Blue Nine Access (APK)
 
 on:
   workflow_dispatch:
-  push:
-    branches: [ main, master ]
+  push: { branches: [ main, master ] }
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
+      - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
 
-      - name: Gradle setup/cache
+      # Install Android SDK + common components
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: |
+            platform-tools
+            platforms;android-34
+            build-tools;34.0.0
+
+      # Use Gradle action to run in your subfolder (no local wrapper required)
+      - name: List Gradle projects (for diagnostics)
         uses: gradle/gradle-build-action@v3
         with:
           gradle-version: 8.7
+          build-root-directory: BlueNineAccess_Full_Buildable/Blue Nine Access
+          arguments: projects
 
-      # Build the app inside "BlueNineAccess_Full_Buildable/Blue Nine Access"
       - name: Build debug APK
-        run: |
-          PROJDIR='BlueNineAccess_Full_Buildable/Blue Nine Access'
-          if [ -x "./gradlew" ]; then
-            chmod +x ./gradlew
-            ./gradlew -p "$PROJDIR" :app:assembleDebug
-          else
-            gradle -p "$PROJDIR" :app:assembleDebug
-          fi
+        uses: gradle/gradle-build-action@v3
+        with:
+          gradle-version: 8.7
+          build-root-directory: BlueNineAccess_Full_Buildable/Blue Nine Access
+          arguments: :app:assembleDebug --stacktrace
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: bluenineaccess-debug-apk
-          path: |
-            BlueNineAccess_Full_Buildable/Blue Nine Access/app/build/outputs/apk/debug/*.apk
+          path: BlueNineAccess_Full_Buildable/Blue Nine Access/app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
