@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Blue Nine Access</string>
+    <color name="bn_blue">#1558C0</color>
+    <color name="ic_launcher_background">#FFFFFF</color>
+</resources>
