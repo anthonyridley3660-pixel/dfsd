@@ -24,24 +24,21 @@ jobs:
         with:
           gradle-version: 8.7
 
-      - name: Build debug APK (try multiple paths)
+      # Build the app inside "BlueNineAccess_Full_Buildable/Blue Nine Access"
+      - name: Build debug APK
         run: |
+          PROJDIR='BlueNineAccess_Full_Buildable/Blue Nine Access'
           if [ -x "./gradlew" ]; then
             chmod +x ./gradlew
-            G=./gradlew
+            ./gradlew -p "$PROJDIR" :app:assembleDebug
           else
-            G=gradle
+            gradle -p "$PROJDIR" :app:assembleDebug
           fi
-
-          set -e
-          $G ":Blue Nine Access:app:assembleDebug" \
-          || $G ":BlueNineAccess:app:assembleDebug" \
-          || $G ":app:assembleDebug"
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: bluenineaccess-debug-apk
-          path: "**/app/build/outputs/apk/debug/*.apk"
+          path: |
+            BlueNineAccess_Full_Buildable/Blue Nine Access/app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
-
