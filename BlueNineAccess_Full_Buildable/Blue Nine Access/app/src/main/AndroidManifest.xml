@@ -6,7 +6,7 @@
         android:label="Blue Nine Access"
         android:icon="@mipmap/ic_launcher"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Material3.DayNight.NoActionBar">
+        android:theme="@style/Theme.BlueNineAccess"
         <activity
             android:name=".MainActivity"
             android:exported="true">
