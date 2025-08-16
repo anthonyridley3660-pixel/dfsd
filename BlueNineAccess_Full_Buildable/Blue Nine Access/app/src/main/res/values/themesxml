@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- App theme that inherits from Material 3 DayNight NoActionBar -->
+    <style name="Theme.BlueNineAccess" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Optional tweaks -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/black</item>
+    </style>
+
+</resources>
